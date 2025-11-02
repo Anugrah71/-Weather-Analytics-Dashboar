@@ -1,4 +1,4 @@
-const API_BASE_URL = "https://weather-analytics-dashboar.vercel.app/"; 
+const API_BASE_URL = "https://weather-analytics-dashboar.vercel.app"; 
 
 export const getCurrentWeather = async (city) => {
   const res = await fetch(`${API_BASE_URL}/api/weather/current?q=${city}`)
