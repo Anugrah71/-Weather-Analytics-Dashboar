@@ -58,6 +58,7 @@ const Dashboard = () => {
           city={selectedCity}
           forecastdays={forecastData.forecast}
           onClose={handleCloseDetail}
+          current={forecastData.current}
         />
       )}
     </div>

@@ -29,18 +29,16 @@ import { getTemperatureTrends } from "../utils/WeatherFormate";
 const convertTemp = (temp, unit) =>
   unit === "fahrenheit" ? (temp * 9) / 5 + 32 : temp;
 
-const DetailedView = ({ city, onClose, forecastdays }) => {
-  const { cities, forecast, unit } = useSelector((state) => state.weather);
-  const cityData = cities.find((c) => c.name === city)?.data;
-  const icon = cityData?.current?.condition?.icon;
-  const condition = cityData?.current?.condition?.text;
+const DetailedView = ({ city, onClose, forecastdays, current }) => {
+  const { unit } = useSelector((state) => state.weather);
 
-  if (!cityData) {
-    console.log("Waiting for city data:", city);
+  const icon = current?.condition?.icon;
+  const condition = current?.condition?.text;
+
+  if (!forecastdays?.forecastday || !current) {
+    console.log("Missing forecast or current data for:", city);
+    return <div className="p-6 text-center text-gray-600">Loading data...</div>;
   }
-
-  const current = cityData.current;
-
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 overflow-y-auto">
       <div className="min-h-screen p-4 flex items-center justify-center">
@@ -51,7 +49,6 @@ const DetailedView = ({ city, onClose, forecastdays }) => {
           >
             <X size={24} />
           </button>
-
           <div className="flex items-center mb-6">
             <ArrowLeft
               size={24}
@@ -60,8 +57,122 @@ const DetailedView = ({ city, onClose, forecastdays }) => {
             />
             <h2 className="text-3xl font-bold text-gray-800">{city}</h2>
           </div>
+          Current Weather
+          <div className="bg-white rounded-xl p-6 mb-6 shadow-lg">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <img src={icon} alt={condition} className="w-12 h-12" />
+                <div className="ml-6">
+                  <div className="text-6xl font-bold text-gray-800">
+                    {convertTemp(current.temp_c, unit).toFixed(1)}°
+                    {unit === "celsius" ? "C" : "F"}
+                  </div>
+                  <div className="text-xl text-gray-600">
+                    {current.condition.text}
+                  </div>
+                  <div className="text-gray-500">
+                    Feels like {convertTemp(current.feelslike_c, unit)}°
+                  </div>
+                </div>
+              </div>
 
-        
+              <div className="grid grid-cols-2 gap-6">
+                <div className="text-center">
+                  <Sunrise className="mx-auto mb-2 text-orange-500" />
+                  <div className="text-sm text-gray-600">sunrise </div>
+                  <div className="font-semibold">
+                    {forecastdays.forecastday[0].astro.sunrise}
+                  </div>
+                </div>
+                <div className="text-center">
+                  <Sunset className="mx-auto mb-2 text-orange-600" />
+                  <div className="text-sm text-gray-600">Sunset</div>
+                  <div className="font-semibold">
+                    {forecastdays.forecastday[0].astro.sunset}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-4 gap-4 mt-6 pt-6 border-t">
+              <div className="text-center">
+                <Droplets className="mx-auto mb-2 text-blue-500" />
+                <div className="text-sm text-gray-600">Humidity</div>
+                <div className="font-semibold">{current.humidity}%</div>
+              </div>
+              <div className="text-center">
+                <Wind className="mx-auto mb-2 text-gray-500" />
+                <div className="text-sm text-gray-600">Wind</div>
+                <div className="font-semibold">{current.wind_kph} km/h</div>
+              </div>
+              <div className="text-center">
+                <Gauge className="mx-auto mb-2 text-purple-500" />
+                <div className="text-sm text-gray-600">Pressure</div>
+                <div className="font-semibold">{current.pressure_mb} hPa</div>
+              </div>
+              <div className="text-center">
+                <Eye className="mx-auto mb-2 text-teal-500" />
+                <div className="text-sm text-gray-600">Visibility</div>
+                <div className="font-semibold">{current.vis_km} km</div>
+              </div>
+            </div>
+          </div>
+          24-Hour Forecast
+          <div className="bg-white rounded-xl p-6 mb-6 shadow-lg">
+            <h3 className="text-xl font-bold mb-4 flex items-center">
+              <Clock size={20} className="mr-2" />
+              24-Hour Forecast
+            </h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={forecastdays?.forecastday?.[0]?.hour || []}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="time" tickFormatter={(t) => t.split(" ")[1]} />
+
+                <YAxis
+                  yAxisId="left"
+                  domain={[
+                    (dataMin) => Math.floor(dataMin - 2),
+                    (dataMax) => Math.ceil(dataMax + 2),
+                  ]}
+                  label={{ value: "°C", angle: -90, position: "insideLeft" }}
+                />
+
+                <YAxis
+                  yAxisId="right"
+                  orientation="right"
+                  domain={[0, 100]}
+                  label={{
+                    value: "% Rain",
+                    angle: -90,
+                    position: "insideRight",
+                  }}
+                />
+
+                <Tooltip />
+                <Legend />
+
+                <Line
+                  yAxisId="left"
+                  type="monotone"
+                  dataKey="temp_c"
+                  stroke="#f59e0b"
+                  strokeWidth={2}
+                  dot={{ r: 2 }}
+                  name="Temperature (°C)"
+                />
+
+                <Line
+                  yAxisId="right"
+                  type="monotone"
+                  dataKey="chance_of_rain"
+                  stroke="#3b82f6"
+                  strokeWidth={2}
+                  dot={{ r: 2 }}
+                  name="Precipitation (%)"
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
           {/*  7-Day Forecast */}
           <div className="bg-white rounded-xl p-6 mb-6 shadow-lg">
             <h3 className="text-xl font-bold mb-4 flex items-center">
@@ -70,7 +181,9 @@ const DetailedView = ({ city, onClose, forecastdays }) => {
             </h3>
 
             <div className="grid grid-cols-7 gap-2">
-              { forecastdays?.forecastday?.map((day, idx) => (
+              {console.log("for", forecastdays)}
+
+              {forecastdays?.forecastday?.map((day, idx) => (
                 <div
                   key={idx}
                   className="text-center p-3 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg"
