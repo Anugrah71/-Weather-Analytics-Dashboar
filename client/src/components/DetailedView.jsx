@@ -143,7 +143,7 @@ const DetailedView = ({ city, onClose, forecastdays, current, history }) => {
           </div>
           {/*  Temperature Trends */}
           <div className="mt-6">
-            <TempTrendChart historyData={historyData} unit={unit} />
+            <TempTrendChart historyData={history} unit={unit} />
           </div>
         </div>
       </div>
