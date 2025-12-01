@@ -3,6 +3,7 @@ import {
   getCurrentWeather,
   getForecast,
   searchCities,
+  getHistory,
 } from "../../api/weather";
 
 export const fetchWeather = createAsyncThunk(
@@ -34,8 +35,8 @@ export const fetchWeatherHistory = createAsyncThunk(
       if (forecastDay?.day) {
         days.push({
           date: formatted,
-          temp_max: forecastDay.day.maxtemp_c,
-          temp_min: forecastDay.day.mintemp_c,
+          max: forecastDay.day.maxtemp_c,
+          min: forecastDay.day.mintemp_c,
         });
       }
     }

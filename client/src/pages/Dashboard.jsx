@@ -128,6 +128,7 @@ const Dashboard = () => {
           forecastdays={forecastData.forecast}
           onClose={handleCloseDetail}
           current={forecastData.current}
+          history={forecastData.history}
         />
       )}
 
