@@ -5,6 +5,8 @@ services:
       - "4000:4000"
     env_file:
       - ./server/.env
+    depends_on:
+      - redis
     restart: always
   frontend:
     build: ./client
@@ -12,4 +14,9 @@ services:
       - "4173:4173"
     depends_on:
       - backend
+    restart: always
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
     restart: always
