@@ -1,18 +1,34 @@
-const cache = new Map()
-const TTL = 60000 // 60 seconds
+const redis = require("redis");
+const client = redis.createClient({
+  url: process.env.REDIS_URL || "redis://redis:6379",
+});
 
-function getCache(key) {
-  const entry = cache.get(key)
-  if (!entry) return null
-  if (Date.now() - entry.timestamp > TTL) {
-    cache.delete(key)
-    return null
+client.on("error", (err) => console.error(" Redis Client Error", err));
+client.on("connect", () => console.log(" Redis Connected Successfully"));
+
+(async () => {
+  try {
+    await client.connect();
+  } catch (err) {
+    console.error("Could not connect to redies");
   }
-  return entry.data
-}
+})();
+//get the saved data from redies
+const getCache = async (key) => {
+  try {
+    const data = await client.get(key);
+    return data ? JSON.parse(data) : null;
+  } catch (err) {
+    return null;
+  }
+};
+//save the data in redies
+const setCache = async (key, data, duration = 3600) => {
+  try {
+    await client.setEx(key, duration, JSON.stringify(data));
+  } catch (err) {
+    console.error("Redis set error", err);
+  }
+};
 
-function setCache(key, data) {
-  cache.set(key, { data, timestamp: Date.now() })
-}
-
-module.exports = { getCache, setCache }
+module.exports = { getCache, setCache };
