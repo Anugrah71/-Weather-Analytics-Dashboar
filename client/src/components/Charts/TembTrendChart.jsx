@@ -14,7 +14,7 @@ import { tempUnits } from "../../utils/tempUtils";
 
 const TempTrendChart = ({ historyData, unit }) => {
   const isLoading = !historyData || historyData.length === 0;
-
+ console.log(">>>>>>>>>>>>>>>>>>>>>>>" ,historyData)
   const convertedData =
     historyData?.map((d) => ({
       date: d.date,

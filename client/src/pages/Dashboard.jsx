@@ -20,6 +20,7 @@ const Dashboard = () => {
   const favorites = useSelector((state) => state.favorites);
   const [selectedCity, setSelectedCity] = useState(null);
   const [forecastData, setForecastData] = useState(null);
+  // console.log("HELLLLLLLLLO",forecastData.history)
 
   useEffect(() => {
     const fetchAll = () => {

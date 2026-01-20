@@ -1,6 +1,6 @@
 import { X, Sunrise, Sunset, Droplets, Wind, Gauge, Eye } from "lucide-react";
 import { useSelector } from "react-redux";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import HourlyForcast from "./Charts/HourlyForcast";
 import Forecast from "./Forcast";
 import TempTrendChart from "./Charts/TembTrendChart";
@@ -10,9 +10,9 @@ import WindTrendChart from "./Charts/WindTrendChart";
 const convertTemp = (temp, unit) =>
   unit === "fahrenheit" ? (temp * 9) / 5 + 32 : temp;
 
-const DetailedView = ({ city, onClose, forecastdays, current }) => {
+const DetailedView = ({ city, onClose, forecastdays, current, history }) => {
   const { unit } = useSelector((state) => state.weather);
-
+  console.log("Here is the 7 day", history);
   const icon = current?.condition?.icon;
   console.log("current ", current);
   const condition = current?.condition?.text;
@@ -23,30 +23,6 @@ const DetailedView = ({ city, onClose, forecastdays, current }) => {
   }
   console.log("DetailedView forecastdays:", forecastdays);
 
-  const [historyData, setHistoryData] = useState([]);
-
-  useEffect(() => {
-    const fetchPastWeek = async () => {
-      const days = [];
-      for (let i = 1; i <= 7; i++) {
-        const date = new Date();
-        date.setDate(date.getDate() - i);
-        const iso = date.toISOString().split("T")[0];
-        const res = await fetch(`/api/weather/history?q=${city}&date=${iso}`);
-        const data = await res.json();
-        if (data?.forecast?.forecastday?.[0]) {
-          const dayData = data.forecast.forecastday[0].day;
-          days.push({
-            date: iso,
-            max: dayData.maxtemp_c,
-            min: dayData.mintemp_c,
-          });
-        }
-      }
-      setHistoryData(days.reverse());
-    };
-    fetchPastWeek();
-  }, [city]);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 overflow-y-auto">
@@ -125,10 +101,14 @@ const DetailedView = ({ city, onClose, forecastdays, current }) => {
                 </div>
               </div>
               <div className="text-center">
-                <img src="./public/uv.png" alt="" className="mx-auto mb-2 w-6 h-6" />{" "}
+                <img
+                  src="./public/uv.png"
+                  alt=""
+                  className="mx-auto mb-2 w-6 h-6"
+                />{" "}
                 <div className="text-xs sm:text-sm text-gray-600">UV Index</div>
                 <div className="font-semibold text-sm sm:text-base">
-                  {current.uv} 
+                  {current.uv}
                 </div>
               </div>
               {/* <div className="text-center">
@@ -168,7 +148,7 @@ const DetailedView = ({ city, onClose, forecastdays, current }) => {
           </div>
           {/*  Temperature Trends */}
           <div className="mt-6">
-            <TempTrendChart historyData={historyData} unit={unit} />
+            <TempTrendChart historyData={history} unit={unit} />ṭ{" "}
           </div>
         </div>
       </div>
