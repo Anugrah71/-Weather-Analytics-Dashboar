@@ -1,23 +1,29 @@
+import api from "../api/axios";
+
 export const getCurrentWeather = async (city) => {
-  const res = await fetch(`/api/weather/current?q=${city}`)
-  if (!res.ok) throw new Error('Failed to fetch current weather')
-  return res.json()
-}
+  const res = await api.get('/api/weather/current', {
+    params: { city } 
+  });
+  return res.data; 
+};
 
 export const getForecast = async (city, days = 7) => {
-  const res = await fetch(`/api/weather/forecast?q=${city}&days=${days}`)
-  if (!res.ok) throw new Error('Failed to fetch forecast')
-  return res.json()
-}
+  const res = await api.get('/api/weather/forecast', {
+    params: { city, days }
+  });
+  return res.data;
+};
 
 export const getHistory = async (city, date) => {
-  const res = await fetch(`/api/weather/history?q=${city}&date=${date}`)
-  if (!res.ok) throw new Error('Failed to fetch history')
-  return res.json()
-}
+  const res = await api.get('/api/weather/history', {
+    params: { city, date }
+  });
+  return res.data;
+};
 
-export const searchCities = async (query) => {
-  const res = await fetch(`/api/weather/search?q=${query}`)
-  if (!res.ok) throw new Error('Failed to fetch search results')
-  return res.json()
-}
+export const searchCities = async (citySearch) => {
+  const res = await api.get('/api/weather/search', {
+    params: { city: citySearch }
+  });
+  return res.data;
+};
