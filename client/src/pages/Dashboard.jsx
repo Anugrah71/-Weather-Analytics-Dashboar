@@ -70,24 +70,6 @@ const Dashboard = () => {
         </div>
       </header>
 
-      {status === "loading" && (
-        <div className="flex flex-col justify-center items-center py-10 text-gray-600 text-center px-4">
-          <div className="animate-spin h-10 w-10 border-4 border-blue-500 border-t-transparent rounded-full mb-4"></div>
-          <p>Fetching latest weather data...</p>
-        </div>
-      )}
-      {status === "failed" && (
-        <div className="flex flex-col justify-center items-center py-10 text-red-600 text-center px-4">
-          <p className="mb-3">Failed to load weather data. Please try again.</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
-          >
-            Retry
-          </button>
-        </div>
-      )}
-
       <main className="max-w-7xl mx-auto px-4 py-6 sm:py-8">
         <div className="mb-4 sm:mb-6 text-center sm:text-left">
           <h2 className="text-lg sm:text-xl font-semibold text-gray-800 mb-1 sm:mb-2">
@@ -98,7 +80,22 @@ const Dashboard = () => {
           </p>
         </div>
 
-        {cities.length === 0 ? (
+        {status === "loading" && cities.length === 0 ? (
+          <div className="flex flex-col justify-center items-center py-10 text-gray-600 text-center px-4">
+            <div className="animate-spin h-10 w-10 border-4 border-blue-500 border-t-transparent rounded-full mb-4"></div>
+            <p>Fetching latest weather data...</p>
+          </div>
+        ) : status === "failed" && cities.length === 0 ? (
+          <div className="flex flex-col justify-center items-center py-10 text-red-600 text-center px-4">
+            <p className="mb-3">Failed to load weather data. Please try again.</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
+            >
+              Retry
+            </button>
+          </div>
+        ) : cities.length === 0 ? (
           <div className="text-center py-12 px-4">
             <Cloud size={64} className="mx-auto text-gray-400 mb-4" />
             <p className="text-gray-600 text-base sm:text-lg">
