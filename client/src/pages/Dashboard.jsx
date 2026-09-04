@@ -20,7 +20,7 @@ const Dashboard = () => {
   const favorites = useSelector((state) => state.favorites);
   const [selectedCity, setSelectedCity] = useState(null);
   const [forecastData, setForecastData] = useState(null);
-  // console.log("HELLLLLLLLLO",forecastData.history)
+  const [loadingCity, setLoadingCity] = useState(null);
 
   useEffect(() => {
     const fetchAll = () => {
@@ -36,16 +36,21 @@ const Dashboard = () => {
   }, [dispatch, favorites]);
 
   const handleCityClick = async (city) => {
-    const [forecastResult, historyResult] = await Promise.all([
-      dispatch(fetchForecast(city)),
-      dispatch(fetchWeatherHistory(city)),
-    ]);
-    const historyData = historyResult?.payload?.history || [];
-    setForecastData({
-      ...forecastResult.payload,
-      history: historyData,
-    });
-    setSelectedCity(city);
+    try {
+      setLoadingCity(city);
+      const [forecastResult, historyResult] = await Promise.all([
+        dispatch(fetchForecast(city)),
+        dispatch(fetchWeatherHistory(city)),
+      ]);
+      const historyData = historyResult?.payload?.history || [];
+      setForecastData({
+        ...forecastResult.payload,
+        history: historyData,
+      });
+      setSelectedCity(city);
+    } finally {
+      setLoadingCity(null);
+    }
   };
 
   const handleCloseDetail = () => setSelectedCity(null);
@@ -116,6 +121,7 @@ const Dashboard = () => {
                 humidity={data.current.humidity}
                 wind_speed={data.current.wind_kph}
                 onClick={() => handleCityClick(name)}
+                isLoading={loadingCity === name}
               />
             ))}
           </div>

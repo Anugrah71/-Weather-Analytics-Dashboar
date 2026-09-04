@@ -19,7 +19,14 @@ const DetailedView = ({ city, onClose, forecastdays, current, history }) => {
 
   if (!forecastdays?.forecastday || !current) {
     console.log("Missing forecast or current data for:", city);
-    return <div className="p-6 text-center text-gray-600">Loading data...</div>;
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+        <div className="bg-white p-6 rounded-2xl shadow-xl flex flex-col items-center">
+          <div className="animate-spin h-10 w-10 border-4 border-blue-500 border-t-transparent rounded-full mb-3"></div>
+          <p className="text-gray-600 text-sm">Loading weather details...</p>
+        </div>
+      </div>
+    );
   }
   console.log("DetailedView forecastdays:", forecastdays);
 

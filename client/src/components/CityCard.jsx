@@ -15,6 +15,7 @@ const CityCard = ({
   humidity,
   wind_speed,
   onClick,
+  isLoading,
 }) => {
   const dispatch = useDispatch();
   const favorites = useSelector((state) => state.favorites);
@@ -34,11 +35,18 @@ const CityCard = ({
     <>
     
       <div
-        className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all cursor-pointer transform hover:scale-105"
+        className="relative bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all cursor-pointer transform hover:scale-105"
         onClick={() => {
-          onClick(city);
+          if (!isLoading) {
+            onClick(city);
+          }
         }}
       >
+        {isLoading && (
+          <div className="absolute inset-0 bg-white/70 backdrop-blur-[1px] rounded-xl flex items-center justify-center z-10">
+            <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+          </div>
+        )}
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-xl font-bold text-gray-800">{city}</h3>
 
