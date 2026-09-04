@@ -36,8 +36,10 @@ const Dashboard = () => {
   }, [dispatch, favorites]);
 
   const handleCityClick = async (city) => {
-    const forecastResult = await dispatch(fetchForecast(city));
-    const historyResult = await dispatch(fetchWeatherHistory(city));
+    const [forecastResult, historyResult] = await Promise.all([
+      dispatch(fetchForecast(city)),
+      dispatch(fetchWeatherHistory(city)),
+    ]);
     const historyData = historyResult?.payload?.history || [];
     setForecastData({
       ...forecastResult.payload,

@@ -172,7 +172,7 @@ router.get("/history", async (req, res) => {
     if (!city || !date)
       return res.status(400).json({ error: "Missing city name or date" });
 
-    const cacheKey = `history_${city.toLocaleLowerCase()}`;
+    const cacheKey = `history_${city.toLowerCase()}_${date}`;
     const cached = await getCache(cacheKey);
     // console.log("hisote",cached)
     if (cached) {

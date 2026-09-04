@@ -23,24 +23,33 @@ export const fetchForecast = createAsyncThunk(
 export const fetchWeatherHistory = createAsyncThunk(
   "weather/fetchWeatherHistory",
   async (city) => {
-    const days = [];
-    for (let i = 0; i < 7; i++) {
+    const dates = Array.from({ length: 7 }, (_, i) => {
       const date = new Date();
       date.setDate(date.getDate() - i);
-      const formatted = date.toISOString().split("T")[0];
+      return date.toISOString().split("T")[0];
+    });
 
-      const data = await getHistory(city, formatted);
-      const forecastDay = data?.forecast?.forecastday?.[0];
+    const results = await Promise.all(
+      dates.map(async (formatted) => {
+        try {
+          const data = await getHistory(city, formatted);
+          const forecastDay = data?.forecast?.forecastday?.[0];
+          if (forecastDay?.day) {
+            return {
+              date: formatted,
+              max: forecastDay.day.maxtemp_c,
+              min: forecastDay.day.mintemp_c,
+            };
+          }
+        } catch (err) {
+          console.error(`Failed to fetch history for ${formatted}:`, err);
+        }
+        return null;
+      })
+    );
 
-      if (forecastDay?.day) {
-        days.push({
-          date: formatted,
-          max: forecastDay.day.maxtemp_c,
-          min: forecastDay.day.mintemp_c,
-        });
-      }
-    }
-    return { city, history: days.reverse() };
+    const validDays = results.filter(Boolean).reverse();
+    return { city, history: validDays };
   }
 );
 
